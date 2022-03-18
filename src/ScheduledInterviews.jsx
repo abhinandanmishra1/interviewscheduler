@@ -45,8 +45,8 @@ function ScheduledInterviews() {
 	return (
 		<div>
 
-			<h1 className="text-xl text-center ">Scheduled Interviews</h1>
-			<div className="flex justify-around flex-wrap w-full ">
+			<h1 className="text-xl text-center font-bold mb-2">Scheduled Interviews</h1>
+			<div className="flex flex-wrap w-full flex-col justify-center items-center md:flex-row md:justify-start md:items-start ">
             {
                 interviews.map((interview) => {
                     return (

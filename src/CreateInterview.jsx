@@ -18,9 +18,11 @@ const CreateInterview = () => {
   const selectedUsers = useRef([]);
   const startTime = useRef();
   const endTime = useRef();
+  const date = useRef();
   
   const interviewName=useRef('');
   const [possible, setPossible] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   useEffect(() => {
 		const getUsers = async () => {
 			const data = await getDocs(userCollectionRef);
@@ -30,18 +32,30 @@ const CreateInterview = () => {
 		getUsers();
     
 	}, []);
+  const updateUser=async(id,newScheduledInterviews)=>{
+    const userRef = doc(db, "users", id);
+    const newField= {
+      scheduledInterviews:newScheduledInterviews
+};
+    await updateDoc(userRef,newField);
+  }
   const checkPossibilty=async()=>{
     const start=startTime.current.value;
     const end=endTime.current.value;
     const interview=interviewName.current.value;
     const usersSelected=[...selectedUsers.current.getSelectedItems()].map((user)=>user.email);
-    const date=moment(start,'YYY-MM-DD HH:mm').format('MMM Do YY').toLocaleString();
+    const interviewDate=date.current.value;
 
+    if(interviewDate<(new Date())){
+        setPossible(false);
+        setErrorMessage("This date is khatam! Tatat Bye bye !!");
+        return;
+    }
     const newObject={
       name:interview,
       startTime:start,
       endTime:end,
-      date:date,
+      date:interviewDate,
       users:usersSelected
     }
     const docRef = await addDoc(collection(db, "interviews"), newObject);
@@ -51,13 +65,12 @@ const CreateInterview = () => {
     usersSelected.map(async(userMail)=>{
         const userData= query(collection(db,'users'),where('email','==',userMail));
         const docSnap =await getDocs(userData);
-        docSnap.forEach(async(document) => {
+        console.log(docSnap)
+        docSnap.forEach((document) => {
             const newScheduledInterviews=[...document.data().scheduledInterviews,{startTime:start,endTime:end,interviewId:docRef.id}]; 
             console.log(document.id, " => ", document.data().scheduledInterviews,"=>",newScheduledInterviews);
-            const DocRef = document(db, "users", document.id);
-            await updateDoc(DocRef, {
-              scheduledInterviews:newScheduledInterviews
-          });
+            
+          updateUser(document.id,newScheduledInterviews);
         });
     })
     // console.log(usersSelected);
@@ -67,33 +80,27 @@ const CreateInterview = () => {
 
      
         <div className='flex  m-4'>
-        <label className='mr-4' htmlFor="name">Name of Interview</label>
-        <input ref={interviewName} className='outline-none border-b-2 w-1/2' type="text" placeholder='Enter Name of Interview' name='name' />
+        <label className='mr-4 font-semibold' htmlFor="name">Name of Interview</label>
+        <input ref={interviewName} className='outline-none border-b-2 border-gray-400 w-1/2' type="text" placeholder='Enter Name of Interview' name='name' />
         </div>
         <div className='flex  m-4'>
-        <label className='mr-4' htmlFor="startTime">Start Time</label>
-        <input ref={startTime} type="datetime-local" name='startTime' />
+        <label className='mr-4 font-semibold' htmlFor="date">Date</label>
+        <input ref={date} type="date" name='date' />
         </div>
         <div className='flex  m-4'>
-        <label className='mr-4' htmlFor="endTime">End Time</label>
-        <input ref={endTime} type="datetime-local"  name='endTime' />
+        <label className='mr-4 font-semibold' htmlFor="startTime">Start Time</label>
+        <input ref={startTime} type="time" name='startTime' />
         </div>
         <div className='flex  m-4'>
-        <label className='mr-4' htmlFor="users">Select Users</label>
-        {/* <select id="select-role" placeholder="Select roles..." className='w-full form-multiselect inline-block mt-1' multiple name="users" >
-          {users.map((user, index) => {
-          return (
-            
-              <option key={index} value={user.id}>{user.name}</option>
-          
-          );
-			})}
-        </select> */}
-
+        <label className='mr-4 font-semibold' htmlFor="endTime">End Time</label>
+        <input ref={endTime} type="time"  name='endTime' />
+        </div>
+        <div className='flex  m-4'>
+        <label className='mr-4 font-semibold' htmlFor="users">Select Users</label>
         <Multiselect options={users} ref={selectedUsers} displayValue="name"/>
-        {/* {console.log(selectedUsers.current.props.options)} */}
-
-        <button onClick={()=>{
+        </div>
+        <div className='flex justify-center w-2/3'>
+        <button className="bg-[#2c76d6] text-white rounded-lg p-2 m-2 font-semibold text-md" onClick={()=>{
           checkPossibilty()}}>Add Interview</button>
         </div>
       

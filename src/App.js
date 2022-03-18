@@ -2,6 +2,7 @@ import { React, useState } from "react";
 import CreateInterview from "./CreateInterview";
 import Random from "./Random";
 import ScheduledInterviews from "./ScheduledInterviews";
+import UpdateInterview from "./UpdateInterview";
 function App() {
 	const [page, setPage] = useState(2);
 	const Header = () => {
@@ -41,7 +42,7 @@ function App() {
 			<div className="flex justify-center items-center">
 				{page == 1 && <CreateInterview />}
 				{page == 2 && <ScheduledInterviews />}
-				{/* {page == 3 && <Random />} */}
+				{page == 3 && <UpdateInterview />}
 			</div>
 		</>
 	);
