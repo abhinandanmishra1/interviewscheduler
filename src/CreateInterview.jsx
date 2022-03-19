@@ -19,10 +19,11 @@ const CreateInterview = () => {
 	const startTime = useRef();
 	const endTime = useRef();
 	const date = useRef();
-
+	const [waiting,setWaiting]=useState(false);
 	const interviewName = useRef("");
 	const [possible, setPossible] = useState(true);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [success,setSuccess]=useState(false);
 
 	useEffect(() => {
 		const getUsers = async () => {
@@ -34,13 +35,20 @@ const CreateInterview = () => {
 	}, []);
 	const updateUser = async (id, newScheduledInterviews) => {
 		const userRef = doc(db, "users", id);
+		
 		const newField = {
 			scheduledInterviews: newScheduledInterviews,
 		};
 		await updateDoc(userRef, newField);
+		setWaiting(false);
+		setSuccess(true);
+		setTimeout(() => {
+			setSuccess(false);
+		}, 3000);
 	};
 
 	const checkPossibilty = async () => {
+		setWaiting(true);
 		const start = startTime.current.value;
 		const end = endTime.current.value;
 		const interview = interviewName.current.value;
@@ -58,6 +66,7 @@ const CreateInterview = () => {
 					const date=value.date;
 					if(date===interviewDate && ((start>=startTime && start<=endTime) || (end>=startTime && end<=endTime))){
 						setPossible(false);
+						setWaiting(false);
 						setErrorMessage("Hey "+user.name+" is not available for the given time slot");
 						elig=false;
 						if(mailsOfSelectedUsers[mailsOfSelectedUsers.length-1]===user.email){
@@ -76,13 +85,14 @@ const CreateInterview = () => {
 			}
 		);
 		
-		if (interview === "" || start === "" || end === "") {
+		if (interview === "" || start === "" || end === "" || interviewDate=='') {
+			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("All Fields are Required!");
 			setTimeout(() => {
 				setPossible(true);
 				setErrorMessage("");
-			}, 5000);
+			}, 3000);
 			return;
 		}
 		const todayDate = moment().date();
@@ -98,46 +108,50 @@ const CreateInterview = () => {
 			(todayDate < 10 ? "0" : "") +
 			todayDate;
 		if (interviewDate < compareStringDate) {
+			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("This date has been passed");
 			setTimeout(() => {
 				setPossible(true);
 				setErrorMessage("");
-			}, 5000);
+			}, 3000);
 			return;
 		}
 
 		if (interviewDate === compareStringDate) {
 			const currentTime = moment().format("HH:mm");
 			if (currentTime < start || currentTime < end) {
+				setWaiting(false);
 				setPossible(false);
 				setErrorMessage("This Time has been passed");
 				setTimeout(() => {
 					setPossible(true);
 					setErrorMessage("");
-				}, 5000);
+				}, 3000);
 				return;
 			}
 		}
 		// console.log(start, end);
 		if (start >= end) {
+			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("Start time must be smaller than End time");
 			setTimeout(() => {
 				setPossible(true);
 				setErrorMessage("");
-			}, 5000);
+			}, 3000);
 			return;
 		}
 
 		setTimeout(() => {
 			if (mailsOfSelectedUsers.length <= 1) {
+				setWaiting(false);
 				setPossible(false);
 				setErrorMessage("Select atleast two partcipants for an interview");
 				setTimeout(() => {
 					setPossible(true);
 					setErrorMessage("");
-				}, 5000);
+				}, 3000);
 				return;
 			}
 		}, 5000);
@@ -173,53 +187,56 @@ const CreateInterview = () => {
 	
 	};
 	return (
-		<div className="w-1/2">
+		<div className="w-1/2 shadow border flex flex-col justify-center ">
+			<span className=" text-2xl font-extrabold text-[#030027] text-center">Create Interview</span>
 			<div className="flex  m-4">
-				<label className="mr-4 font-semibold" htmlFor="name">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="name">
 					Name of Interview
 				</label>
 				<input
 					ref={interviewName}
-					className="outline-none border-b-2 border-gray-400 w-1/2"
+					className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
 					type="text"
 					placeholder="Enter Name of Interview"
 					name="name"
 				/>
 			</div>
 			<div className="flex  m-4">
-				<label className="mr-4 font-semibold" htmlFor="date">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="date">
 					Date
 				</label>
-				<input ref={date} type="date" name="date" />
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={date} type="date" name="date" />
 			</div>
 			<div className="flex  m-4">
-				<label className="mr-4 font-semibold" htmlFor="startTime">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="startTime">
 					Start Time
 				</label>
-				<input ref={startTime} type="time" name="startTime" />
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={startTime} type="time" name="startTime" />
 			</div>
 			<div className="flex  m-4">
-				<label className="mr-4 font-semibold" htmlFor="endTime">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="endTime">
 					End Time
 				</label>
-				<input ref={endTime} type="time" name="endTime" />
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={endTime} type="time" name="endTime" />
 			</div>
-			<div className="flex  m-4">
-				<label className="mr-4 font-semibold" htmlFor="users">
+			<div className="flex  m-4 ">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 flex flex-col justify-center  items-start" htmlFor="users">
 					Select Users
 				</label>
-				<Multiselect options={users} ref={selectedUsers} displayValue="name" />
+				<Multiselect className="bg-gray-200 w-full focus:border-purple-500"options={users} ref={selectedUsers} displayValue="name" />
 			</div>
-			<div className="flex justify-center w-2/3">
+			<div className="flex justify-center w-5/6">
 				<button
-					className="bg-[#2c76d6] text-white rounded-lg p-2 m-2 font-semibold text-md"
+					className="transition duration-500 transform hover:-translate-y-1 inline-block bg-blue-700 text-lg font-medium text-white rounded-full px-4 py-2 m-2 cursor-pointer"
 					onClick={
 						checkPossibilty
 					}>
 					Add Interview
 				</button>
 			</div>
-			{!possible && <div className="text-red-600 ">{errorMessage}</div>}
+			{!possible && <div className="text-red-600 text-center font-bold text-xl">{errorMessage}</div>}
+			{success && <div className="text-green-600 text-center font-bold text-xl ">Interview Created SucessFully</div>}
+			{waiting && <div className="text-blue-600 text-center font-bold text-xl ">Creating Interview...</div>}
 		</div>
 	);
 };

@@ -201,13 +201,13 @@ const UpdateInterview = () => {
   }
   const InterviewItem = (props) => {
     return (
-      <div className='cursor-pointer' onClick={()=>setAttributes(props)}>{props.name}</div>
+      <div className='cursor-pointer mt-2 bg-teal-500 hover:bg-teal-400 text-white font-bold py-2 px-4 border-b-4 border-teal-700 hover:border-teal-500 rounded-full ' onClick={()=>setAttributes(props)}>{props.name}</div>
     )
   }
 	return (
-		<div className="flex w-full">
+		<div className="flex w-5/6">
 			<div className="w-1/3 flex justify-center flex-col items-center">
-				<h1 className=" font-extrabold mb-2">Update Interview</h1>
+				<h1 className=" font-bold mb-2 text-xl text-[#030027] pb-2 border-b-2 border-[#030027]">Update Interview</h1>
 				{interviews.map((interview) => {
 					return (
 						<InterviewItem
@@ -221,52 +221,50 @@ const UpdateInterview = () => {
 						/>
 					);
 				})}
+				{interviews.length===0 && <div className="w-80 h-40 ml-2 mt-2 border rounded-lg bg-[#030027] text-white flex flex-col justify-center items-center"> 
+				No interviews are scheduled till now.
+			</div>}
 			</div>
-			<div className="w-2/3 flex justify-center flex-col items-center">
-				<div className="flex  m-4">
-					<label className="mr-4 font-semibold" htmlFor="name">
-						Name of Interview
-					</label>
-					<input
-						ref={interviewName}
-						className="outline-none border-b-2 border-gray-400 w-1/2"
-						type="text"
-						placeholder="Enter Name of Interview"
-						name="name"
-					/>
-				</div>
-				<div className="flex  m-4">
-					<label className="mr-4 font-semibold" htmlFor="date">
-						Date
-					</label>
-					<input ref={date} type="date" name="date" />
-				</div>
-				<div className="flex  m-4">
-					<label className="mr-4 font-semibold" htmlFor="startTime">
-						Start Time
-					</label>
-					<input ref={startTime} type="time" name="startTime" />
-				</div>
-				<div className="flex  m-4">
-					<label className="mr-4 font-semibold" htmlFor="endTime">
-						End Time
-					</label>
-					<input ref={endTime} type="time" name="endTime" />
-				</div>
-				<div className="flex  m-4">
-					<label className="mr-4 font-semibold" htmlFor="users">
-						Select Users 
-					</label>
-					<Multiselect
-          placeholder="Select Users Again"
-						options={users}
-						ref={selectedUsers}
-						displayValue="name"
-					/>
-				</div>
-        <div className="flex justify-center w-2/3">
+			<div className="shadow w-1/2 border flex flex-col justify-center ">
+			<div className="flex  m-4">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4  " htmlFor="name">
+					Name of Interview
+				</label>
+				<input
+					ref={interviewName}
+					className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+					type="text"
+					placeholder="Enter Name of Interview"
+					name="name"
+				/>
+			</div>
+			<div className="flex  m-4">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="date">
+					Date
+				</label>
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={date} type="date" name="date" />
+			</div>
+			<div className="flex  m-4">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="startTime">
+					Start Time
+				</label>
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={startTime} type="time" name="startTime" />
+			</div>
+			<div className="flex  m-4">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 " htmlFor="endTime">
+					End Time
+				</label>
+				<input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" ref={endTime} type="time" name="endTime" />
+			</div>
+			<div className="flex  m-4 ">
+				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 flex flex-col justify-center  items-start" htmlFor="users">
+					Select Users
+				</label>
+				<Multiselect className="bg-gray-200 w-full focus:border-purple-500"options={users} ref={selectedUsers} displayValue="name" />
+			</div>
+        <div className="flex justify-center w-full">
 				<button
-					className="bg-[#2c76d6] text-white rounded-lg p-2 m-2 font-semibold text-md"
+					className="transition duration-500 transform hover:-translate-y-1 inline-block bg-blue-700 text-lg font-medium text-white rounded-full px-4 py-2 m-2 cursor-pointer"
 					onClick={
 						()=>{
               update();

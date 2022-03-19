@@ -39,7 +39,7 @@ function ScheduledInterviews() {
 	//setting users
 
 	return (
-		<div>
+		<div className="flex flex-col justify-center items-center">
 
 			<h1 className="text-xl text-center font-bold mb-2">Scheduled Interviews</h1>
 			<div className="flex flex-wrap w-full flex-col justify-center items-center md:flex-row md:justify-start md:items-start ">
@@ -56,6 +56,9 @@ function ScheduledInterviews() {
                     );
                 })
             }
+			{interviews.length===0 && <div className="md:w-96 sm:w-80 w-64 h-40 ml-2 mt-2 border rounded-lg bg-[#030027] text-white flex flex-col justify-center items-center"> 
+				No interviews are scheduled till now.
+			</div>}
             </div>
 		</div>
 	);
