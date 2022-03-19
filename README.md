@@ -1,6 +1,6 @@
 # Required Tasks
 
-- [ ] Create an interview by selecting users
+- [x] Create an interview by selecting users
 - [ ] An interview must have atleast 2 members
 - [ ] If an user is already scheduled for a meeting at a given time then admin can't assign it to any other meeting in that time interval
 - [ ] Update the interview

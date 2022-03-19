@@ -2,13 +2,9 @@ import { useState, useEffect, createElement } from "react";
 import { db } from "./firebase-config";
 import {
 	collection,
-	getDoc,
 	getDocs,
-	doc,
 	updateDoc,
-	addDoc,
 } from "firebase/firestore";
-import { async } from "@firebase/util";
 import Interview from "./Interview";
 
 function ScheduledInterviews() {
@@ -38,7 +34,7 @@ function ScheduledInterviews() {
 			setInterviews(data.docs.map((doc) => ({ ...doc.data() })));
 		};
 		getInterviews();
-	}, []);
+	}, );
 
 	//setting users
 
