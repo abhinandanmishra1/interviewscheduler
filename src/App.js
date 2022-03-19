@@ -46,7 +46,11 @@ function App() {
 							clip-rule="evenodd"
 						/>
 					</svg>
-					Admin
+					<a
+						href="https://github.com/abhinandanmishra1/interviewscheduler"
+						target="_blank">
+						Admin
+					</a>
 				</div>
 			</div>
 		);
