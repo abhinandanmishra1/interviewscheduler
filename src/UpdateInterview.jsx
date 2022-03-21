@@ -240,9 +240,11 @@ const UpdateInterview = () => {
 				return;
 			}
 		}, 5000);
-	setWaiting(true);
+	
     setTimeout(async() => {
+		
 		if(mailsOfSelectedUsers.length>1){
+			setWaiting(true);
 			mailsOfSelectedUsers.forEach(async (userMail) => {
 				const userData = query(
 					collection(db, "users"),
