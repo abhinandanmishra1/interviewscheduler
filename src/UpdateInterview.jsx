@@ -142,32 +142,34 @@ const UpdateInterview = () => {
 
 	// Storing the values of selected members
 
-    selectedUsers.current.getSelectedItems().forEach((user) => {
-      const scheduled=user.scheduledInterviews;
-      let elig=true;
-      mailsOfSelectedUsers.push(user.email);
-      scheduled.forEach((value)=>{
-        
-        const startTime=value.startTime;
-        const endTime=value.endTime;
-        const date=value.date;
-        if(date===interviewDate && ((start>=startTime && start<=endTime) || (end>=startTime && end<=endTime))){
-          setPossible(false);
-          setErrorMessage(user.name+" is not available for the given time slot");
-          elig=false;
-          if(mailsOfSelectedUsers[mailsOfSelectedUsers.length-1]===user.email){
-            mailsOfSelectedUsers.pop();
-          }
-          setTimeout(() => {
-            setPossible(true);
-            setErrorMessage("");
-          }, 2000);
-          return false;
-        }
-      })
-      
-      return elig;
-    });
+    setTimeout(()=>{
+		selectedUsers.current.getSelectedItems().forEach((user) => {
+			const scheduled=user.scheduledInterviews;
+			let elig=true;
+			mailsOfSelectedUsers.push(user.email);
+			scheduled.forEach((value)=>{
+			  
+			  const startTime=value.startTime;
+			  const endTime=value.endTime;
+			  const date=value.date;
+			  if(date===interviewDate && ((start>=startTime && start<=endTime) || (end>=startTime && end<=endTime))){
+				setPossible(false);
+				setErrorMessage(user.name+" is not available for the given time slot");
+				elig=false;
+				if(mailsOfSelectedUsers[mailsOfSelectedUsers.length-1]===user.email){
+				  mailsOfSelectedUsers.pop();
+				}
+				setTimeout(() => {
+				  setPossible(true);
+				  setErrorMessage("");
+				}, 2000);
+				return false;
+			  }
+			})
+			
+			return elig;
+		  });
+	},5000)
 
 	
     if (interview === "" || start === "" || end === "") {
@@ -262,7 +264,7 @@ const UpdateInterview = () => {
 				name:interviewName.current.value,
 				date:date.current.value
 			}
-			console.log(updatedInterview)
+			console.log(updatedInterview.name," is updated!")
 			updateInterview(interviewId, updatedInterview);
 	}
 	}, (10000));
