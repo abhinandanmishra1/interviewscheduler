@@ -26,30 +26,27 @@ const UpdateInterview = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 	const interviewName = useRef("");
   const [interviewId,setInterviewId]=useState("");
-  const [intialMails,setInitialMails]=useState([]);
+  const [initialMails,setInitialMails]=useState([]);
+
+  const [waiting,setWaiting]=useState(false);
+  const [success,setSuccess]=useState(false);
+
+
   // this function is to set already present values in the interview
   const setAttributes=async(interview)=>{
-    console.log(interview)
     interviewName.current.value=interview.name;
     startTime.current.value=interview.start;
     endTime.current.value=interview.end;
     date.current.value=interview.date
-    selectedUsers.current.getSelectedItems().forEach((user)=>{
-      setInitialMails(intialMails=>[...intialMails,user.mail]);
-    })
     const interviewData = query(
       collection(db, "interviews"),
      where("date", "==", date.current.value),
      where("startTime","==",startTime.current.value),
      where("endTime","==",endTime.current.value)
    );
-   console.log(date.current.value,startTime.current.value,endTime.current.value)
    const docSnap = await getDocs(interviewData);
-
-   console.log(docSnap)
    docSnap.forEach((document) => {
      setInterviewId(document.id);
-      console.log("set id")
    });
   }
 
@@ -71,7 +68,17 @@ const UpdateInterview = () => {
 		getInterviews();
 	}, []);
   //pasted
-  
+  const updateUser = async (id, newScheduledInterviews) => {
+	const userRef = doc(db, "users", id);
+	
+	const newField = {
+		scheduledInterviews: newScheduledInterviews,
+	};
+	await updateDoc(userRef, newField);
+	setTimeout(()=>{
+		console.log("User Updated!")
+	},3000);
+};
   const updateInterview=async (id, updatedInterview) => {
     if(id===""){
       setPossible(false);
@@ -84,7 +91,12 @@ const UpdateInterview = () => {
     }
 		const interrviewRef = doc(db, "interviews", id);
 		await updateDoc(interrviewRef, updatedInterview);
-    console.log("Data Updated")
+    
+		setWaiting(false);
+		setSuccess(true);
+		setTimeout(() => {
+			setSuccess(false);
+		}, 3000);
 	};
   // interview component
   const update=async()=>{
@@ -93,6 +105,43 @@ const UpdateInterview = () => {
 		const end = endTime.current.value;
 		const interview = interviewName.current.value;
 		const interviewDate = date.current.value;
+	// I have to set Initial mails of people who was already in the interview
+	if(interviewId===""){
+		setPossible(false);
+			setErrorMessage("Please select an interview!");
+			setTimeout(() => {
+				setPossible(true);
+				setErrorMessage("");
+			}, 5000);
+			return;
+	}
+
+
+	
+	const interrviewRef =  doc(db, "interviews", interviewId);
+	const interviewDoc=await getDoc(interrviewRef);
+	const interviewData=interviewDoc.data();
+	
+	// if instead of saving mails I delete the data from users (and not interviews because we
+	// are already updating it) 
+	// this function will be similar to create Interview and no any problem 
+	interviewData.users.forEach(async(userMail)=>{
+		const userData = query(
+			collection(db, "users"),
+			where("email", "==", userMail)
+		);
+		const docSnap = await getDocs(userData);
+		docSnap.forEach((document) => {
+			const newScheduledInterviews =document.data().scheduledInterviews.filter((interview)=>{
+				return interview.interviewId!==interviewId;
+			});
+			console.log("Working.....");
+			updateUser(document.id, newScheduledInterviews);
+		});
+	})
+
+	// Storing the values of selected members
+
     selectedUsers.current.getSelectedItems().forEach((user) => {
       const scheduled=user.scheduledInterviews;
       let elig=true;
@@ -104,7 +153,7 @@ const UpdateInterview = () => {
         const date=value.date;
         if(date===interviewDate && ((start>=startTime && start<=endTime) || (end>=startTime && end<=endTime))){
           setPossible(false);
-          setErrorMessage("Hey "+user.name+" is not available for the given time slot");
+          setErrorMessage(user.name+" is not available for the given time slot");
           elig=false;
           if(mailsOfSelectedUsers[mailsOfSelectedUsers.length-1]===user.email){
             mailsOfSelectedUsers.pop();
@@ -117,12 +166,13 @@ const UpdateInterview = () => {
         }
       })
       
-      
       return elig;
     });
+
+	
     if (interview === "" || start === "" || end === "") {
 			setPossible(false);
-			setErrorMessage("All Fields are Required!");
+			setErrorMessage("All fields are required!");
 			setTimeout(() => {
 				setPossible(true);
 				setErrorMessage("");
@@ -153,7 +203,11 @@ const UpdateInterview = () => {
 
 		if (interviewDate === compareStringDate) {
 			const currentTime = moment().format("HH:mm");
-			if (currentTime < start || currentTime < end) {
+			console.log("Current Time ->",currentTime);
+			console.log("Start Time ->",start);
+			console.log("End Time ->",end);
+
+			if ((currentTime > start) || (currentTime > end)) {
 				setPossible(false);
 				setErrorMessage("This Time has been passed");
 				setTimeout(() => {
@@ -184,19 +238,33 @@ const UpdateInterview = () => {
 				return;
 			}
 		}, 5000);
-
+	setWaiting(true);
     setTimeout(async() => {
-			if(mailsOfSelectedUsers.length>1){
-    const updatedInterview={
-      startTime:startTime.current.value,
-      endTime:endTime.current.value,
-      users:mailsOfSelectedUsers,
-      name:interviewName.current.value,
-      date:date.current.value
-    }
-    console.log(updatedInterview)
-		updateInterview(interviewId, updatedInterview);
-  }
+		if(mailsOfSelectedUsers.length>1){
+			mailsOfSelectedUsers.forEach(async (userMail) => {
+				const userData = query(
+					collection(db, "users"),
+					where("email", "==", userMail)
+				);
+				const docSnap = await getDocs(userData);
+				docSnap.forEach((document) => {
+					const newScheduledInterviews = [
+						...document.data().scheduledInterviews,
+						{startTime:start,endTime:end,date:interviewDate,interviewId:interviewId}
+					];
+					updateUser(document.id, newScheduledInterviews);
+				});
+			});
+			const updatedInterview={
+				startTime:startTime.current.value,
+				endTime:endTime.current.value,
+				users:mailsOfSelectedUsers,
+				name:interviewName.current.value,
+				date:date.current.value
+			}
+			console.log(updatedInterview)
+			updateInterview(interviewId, updatedInterview);
+	}
 	}, (10000));
   }
   const InterviewItem = (props) => {
@@ -204,6 +272,7 @@ const UpdateInterview = () => {
       <div className='cursor-pointer mt-2 bg-teal-500 hover:bg-teal-400 text-white font-bold py-2 px-4 border-b-4 border-teal-700 hover:border-teal-500 rounded-full ' onClick={()=>setAttributes(props)}>{props.name}</div>
     )
   }
+
 	return (
 		<div className="flex w-5/6">
 			<div className="w-1/3 flex justify-center flex-col items-center">
@@ -260,7 +329,7 @@ const UpdateInterview = () => {
 				<label className="ml-4 mr-4 text-gray-500 font-bold mb-1 md:mb-0 pr-4 w-1/3 flex flex-col justify-center  items-start" htmlFor="users">
 					Select Users
 				</label>
-				<Multiselect className="bg-gray-200 w-full focus:border-purple-500"options={users} ref={selectedUsers} displayValue="name" />
+				<Multiselect showCheckbox="true" keepSearchTerm="true" placeholder="Select Users"  className="bg-gray-200 w-full focus:border-purple-500"options={users} ref={selectedUsers} displayValue="name" />
 			</div>
         <div className="flex justify-center w-full">
 				<button
@@ -273,7 +342,9 @@ const UpdateInterview = () => {
 					Update Interview
 				</button>
 			</div>
-			{!possible && <div className="text-red-600 ">{errorMessage}</div>}
+			{!possible && <div className="text-red-600 text-center font-bold text-xl">{errorMessage}</div>}
+			{success && <div className="text-green-600 text-center font-bold text-xl ">Interview Updated SucessFully</div>}
+			{waiting && <div className="text-blue-600 text-center font-bold text-xl ">Updating Interview...</div>}
 
 			</div>
       

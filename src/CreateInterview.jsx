@@ -33,6 +33,8 @@ const CreateInterview = () => {
 		};
 		getUsers();
 	}, []);
+
+
 	const updateUser = async (id, newScheduledInterviews) => {
 		const userRef = doc(db, "users", id);
 		
@@ -48,7 +50,6 @@ const CreateInterview = () => {
 	};
 
 	const checkPossibilty = async () => {
-		setWaiting(true);
 		const start = startTime.current.value;
 		const end = endTime.current.value;
 		const interview = interviewName.current.value;
@@ -86,7 +87,6 @@ const CreateInterview = () => {
 		);
 		
 		if (interview === "" || start === "" || end === "" || interviewDate=='') {
-			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("All Fields are Required!");
 			setTimeout(() => {
@@ -108,7 +108,6 @@ const CreateInterview = () => {
 			(todayDate < 10 ? "0" : "") +
 			todayDate;
 		if (interviewDate < compareStringDate) {
-			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("This date has been passed");
 			setTimeout(() => {
@@ -120,8 +119,7 @@ const CreateInterview = () => {
 
 		if (interviewDate === compareStringDate) {
 			const currentTime = moment().format("HH:mm");
-			if (currentTime < start || currentTime < end) {
-				setWaiting(false);
+			if (currentTime > start || currentTime > end) {
 				setPossible(false);
 				setErrorMessage("This Time has been passed");
 				setTimeout(() => {
@@ -133,7 +131,6 @@ const CreateInterview = () => {
 		}
 		// console.log(start, end);
 		if (start >= end) {
-			setWaiting(false);
 			setPossible(false);
 			setErrorMessage("Start time must be smaller than End time");
 			setTimeout(() => {
@@ -145,7 +142,6 @@ const CreateInterview = () => {
 
 		setTimeout(() => {
 			if (mailsOfSelectedUsers.length <= 1) {
-				setWaiting(false);
 				setPossible(false);
 				setErrorMessage("Select atleast two partcipants for an interview");
 				setTimeout(() => {
@@ -155,6 +151,7 @@ const CreateInterview = () => {
 				return;
 			}
 		}, 5000);
+		setWaiting(true);
     
    
     	setTimeout(async() => {
