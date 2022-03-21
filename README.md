@@ -1,4 +1,4 @@
-# [See Deployed Version ](https://interviewscheduler-ajell8wow-abhinandanmishra1.vercel.app/)
+# [See Deployed Version ](https://interviewscheduler.vercel.app/)
 # Required Tasks
 
 - [x] Create an interview by selecting users
