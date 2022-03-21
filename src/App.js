@@ -4,20 +4,20 @@ import ScheduledInterviews from "./ScheduledInterviews";
 import UpdateInterview from "./UpdateInterview";
 function App() {
 	const [page, setPage] = useState(2);
-	const customClass = "border-b-2 border-teal-500 rounded-sm hover:rounded-xl";
+	const customClass = "border-b-4 border-teal-500 mt-1";
 	const necessaryClasses =
-		"cursor-pointer p-2 hover:bg-teal-700  hover:text-white font-bold rounded-xl ";
+		"cursor-pointer p-2 hover:bg-teal-700  text-sm md:text-base hover:text-white md:font-bold rounded-sm hover:rounded-xl ";
 	const Header = () => {
 		return (
-			<div className=" h-16 bg-[#fff] text-[#1a3d3c] font-bold flex items-center">
-				<div className="w-1/3 cursor-pointer ">
+			<div className=" h-16 bg-[#fff] text-[#1a3d3c] font-bold flex items-center border-b-2 mb-2">
+				<div className="w-1/3 cursor-pointer ml-2 hidden sm:block">
 					<img
-						className="w-40"
+						className="md:w-40 w-28"
 						src="https://assets.interviewbit.com/packs/images/logo.87a398.svg"
 						alt="Logo"
 					/>
 				</div>
-				<div className=" w-1/3 flex justify-between">
+				<div className="ml-2 md:ml-0 md:w-1/3 w-2/3 flex justify-between">
 					<div
 						onClick={() => setPage(1)}
 						className={necessaryClasses + (page == 1 ? customClass : "")}>
@@ -34,7 +34,7 @@ function App() {
 						Update Interview
 					</div>
 				</div>
-				<div className="w-1/3 flex  justify-end items-center cursor-pointer mr-4">
+				<div className="w-1/3  flex  justify-end items-center cursor-pointer mr-4">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-5 w-5"
@@ -48,7 +48,8 @@ function App() {
 					</svg>
 					<a
 						href="https://github.com/abhinandanmishra1/interviewscheduler"
-						target="_blank">
+						target="_blank"
+						className="text-sm md:text-lg">
 						Admin
 					</a>
 				</div>

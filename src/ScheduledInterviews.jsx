@@ -41,7 +41,7 @@ function ScheduledInterviews() {
 	return (
 		<div className="flex flex-col justify-center items-center">
 
-			<h1 className="text-xl text-center font-bold mb-2">Scheduled Interviews</h1>
+			<h1 className="md:text-xl sm:text-lg text-base text-center font-bold mb-2">Scheduled Interviews</h1>
 			<div className="flex flex-wrap w-full flex-col justify-center items-center md:flex-row md:justify-start md:items-start ">
             {
                 interviews.map((interview) => {
